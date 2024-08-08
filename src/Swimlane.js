@@ -13,7 +13,7 @@ export default class Swimlane extends React.Component {
           description={client.description}
           status={client.status}
         />
-      );
+      );  
     })
     return (
       <div className="Swimlane-column">
