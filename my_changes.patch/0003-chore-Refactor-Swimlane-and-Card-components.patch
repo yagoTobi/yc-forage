@@ -1,0 +1,358 @@
+From f1b01e65b156ac1881b19438ad0ea78c3c6c8dcb Mon Sep 17 00:00:00 2001
+From: Yago Tobio <201802168@alu.comillas.edu>
+Date: Thu, 8 Aug 2024 15:50:46 +0100
+Subject: [PATCH 3/3] chore: Refactor Swimlane and Card components
+
+Refactor the Swimlane and Card components to improve code readability and maintainability. Update Swimlane.js to fix a syntax error and remove unnecessary whitespace. Update Card.js to fix a typo in the status comparison and add a description element.
+---
+ package-lock.json | 44 +++++++++++++++++++++---
+ package.json      |  3 +-
+ src/App.js        | 23 ++++++++++---
+ src/Board.js      | 88 ++++++++++++++++++++++++++++++++++++++++-------
+ src/Card.js       |  9 +++--
+ src/Swimlane.js   |  2 +-
+ 6 files changed, 145 insertions(+), 24 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 4c2c8ee..73ab843 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -14,6 +14,7 @@
+         "popper.js": "^1.14.7",
+         "react": "^16.7.0",
+         "react-dom": "^16.7.0",
++        "react-dragula": "^1.1.17",
+         "react-scripts": "^5.0.1"
+       },
+       "engines": {
+@@ -15590,6 +15591,41 @@
+         "react": "^16.14.0"
+       }
+     },
++    "node_modules/react-dragula": {
++      "version": "1.1.17",
++      "resolved": "https://registry.npmjs.org/react-dragula/-/react-dragula-1.1.17.tgz",
++      "integrity": "sha512-gJdY190sPWAyV8jz79vyK9SGk97bVOHjUguVNIYIEVosvt27HLxnbJo4qiuEkb/nAuGY13Im2CHup92fUyO3fw==",
++      "license": "MIT",
++      "dependencies": {
++        "atoa": "1.0.0",
++        "dragula": "3.7.2"
++      }
++    },
++    "node_modules/react-dragula/node_modules/crossvent": {
++      "version": "1.5.4",
++      "resolved": "https://registry.npmjs.org/crossvent/-/crossvent-1.5.4.tgz",
++      "integrity": "sha512-b6gEmNAh3kemyfNJ0LQzA/29A+YeGwevlSkNp2x0TzLOMYc0b85qRAD06OUuLWLQpR7HdJHNZQTlD1cfwoTrzg==",
++      "license": "MIT",
++      "dependencies": {
++        "custom-event": "1.0.0"
++      }
++    },
++    "node_modules/react-dragula/node_modules/custom-event": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/custom-event/-/custom-event-1.0.0.tgz",
++      "integrity": "sha512-6nOXX3UitrmdvSJWoVR2dlzhbX5bEUqmqsMUyx1ypCLZkHHkcuYtdpW3p94RGvcFkTV7DkLo+Ilbwnlwi8L+jw==",
++      "license": "MIT"
++    },
++    "node_modules/react-dragula/node_modules/dragula": {
++      "version": "3.7.2",
++      "resolved": "https://registry.npmjs.org/dragula/-/dragula-3.7.2.tgz",
++      "integrity": "sha512-iDPdNTPZY7P/l0CQ800QiX+PNA2XF9iC3ePLWfGxeb/j8iPPedRuQdfSOfZrazgSpmaShYvYQ/jx7keWb4YNzA==",
++      "license": "MIT",
++      "dependencies": {
++        "contra": "1.9.4",
++        "crossvent": "1.5.4"
++      }
++    },
+     "node_modules/react-error-overlay": {
+       "version": "6.0.11",
+       "resolved": "https://registry.npmjs.org/react-error-overlay/-/react-error-overlay-6.0.11.tgz",
+@@ -17897,9 +17933,9 @@
+       }
+     },
+     "node_modules/typescript": {
+-      "version": "5.5.4",
+-      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.5.4.tgz",
+-      "integrity": "sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==",
++      "version": "4.9.5",
++      "resolved": "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz",
++      "integrity": "sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==",
+       "license": "Apache-2.0",
+       "peer": true,
+       "bin": {
+@@ -17907,7 +17943,7 @@
+         "tsserver": "bin/tsserver"
+       },
+       "engines": {
+-        "node": ">=14.17"
++        "node": ">=4.2.0"
+       }
+     },
+     "node_modules/unbox-primitive": {
+diff --git a/package.json b/package.json
+index e036227..1176cf2 100644
+--- a/package.json
++++ b/package.json
+@@ -13,6 +13,7 @@
+     "popper.js": "^1.14.7",
+     "react": "^16.7.0",
+     "react-dom": "^16.7.0",
++    "react-dragula": "^1.1.17",
+     "react-scripts": "^5.0.1"
+   },
+   "scripts": {
+@@ -30,4 +31,4 @@
+     "not ie <= 11",
+     "not op_mini all"
+   ]
+-}
+\ No newline at end of file
++}
+diff --git a/src/App.js b/src/App.js
+index 18bcba9..96859f0 100755
+--- a/src/App.js
++++ b/src/App.js
+@@ -5,17 +5,25 @@ import Navigation from './Navigation';
+ import Board from './Board';
+ import './App.css';
+ 
++
++//Okay, let's try to understand this code: 
++//We have a class called App that extends Component from React.
+ class App extends Component {
++  //Class constructor - setting the initial state of the selectedTab to 'home'.
+   constructor(props) {
+     super(props);
+     this.state = {
+       selectedTab: 'home',
+     };
+   }
++
++  //Methods:
++  //The renderShippingRequests method returns the Board component.
+   renderShippingRequests() {
+     return (<Board />);
+   }
+ 
++  //The renderNavigation method returns the Navigation component in order to render the navigation bar and pass the onClick.
+   renderNavigation() {
+     return (<Navigation
+       onClick={(tabName) => this.changeTab(tabName)}
+@@ -23,27 +31,34 @@ class App extends Component {
+       />);
+   }
+ 
++  //The renderTabContent method returns the HomeTab component if the selectedTab is 'home' or the renderShippingRequests method if the selectedTab is 'shipping-requests'.
+   renderTabContent() {
++    //Switch statement to determine which tab to render.
+     switch(this.state.selectedTab) {
+       case 'home':
+       default:
+-        return HomeTab();
++        return HomeTab(); //Invokes the HomeTab component.
+       case 'shipping-requests':
+-        return this.renderShippingRequests();
++        return this.renderShippingRequests(); //Invokes the renderShippingRequests method.
+     }
+   }
++
++  //The render method returns the App component.
+   render() {
+     return (
++      //The App component has a div with the class name "App".
+       <div className="App">
++        {/* Navigation Tab Rendering. */}
+         {this.renderNavigation()}
+-
+         <div className="App-body">
++          {/* Tab Content upon selection */}
+           {this.renderTabContent()}
+         </div>
+       </div>
+     );
+   }
+ 
++  //The changeTab method changes the selectedTab state.
+   changeTab(tabName) {
+     this.setState({
+       selectedTab: tabName,
+@@ -51,4 +66,4 @@ class App extends Component {
+   }
+ }
+ 
+-export default App;
++export default App;
+\ No newline at end of file
+diff --git a/src/Board.js b/src/Board.js
+index 1f00045..934956e 100644
+--- a/src/Board.js
++++ b/src/Board.js
+@@ -1,9 +1,11 @@
+ import React from 'react';
+-import Dragula from 'dragula';
+-import 'dragula/dist/dragula.css';
++import Dragula from 'react-dragula';
++import 'react-dragula/dist/dragula.css';
+ import Swimlane from './Swimlane';
+ import './Board.css';
+ 
++//The Board component is a class that extends React.Component. 
++//React.Component is a base class for React components when they are defined using ES6 classes.
+ export default class Board extends React.Component {
+   constructor(props) {
+     super(props);
+@@ -11,7 +13,7 @@ export default class Board extends React.Component {
+     this.state = {
+       clients: {
+         backlog: clients.filter(client => !client.status || client.status === 'backlog'),
+-        inProgress: clients.filter(client => client.status && client.status === 'in-progress'),
++        inProgress: clients.filter(client => client.status && client.status === 'inProgress'),
+         complete: clients.filter(client => client.status && client.status === 'complete'),
+       }
+     }
+@@ -21,25 +23,86 @@ export default class Board extends React.Component {
+       complete: React.createRef(),
+     }
+   }
++
++  componentDidMount() {
++    const containers = [
++      this.swimlanes.backlog.current,
++      this.swimlanes.inProgress.current,
++      this.swimlanes.complete.current
++    ];
++
++    this.drake = Dragula(containers, {
++      moves: (el, container, handle) => {
++        return handle.classList.contains('Card');
++      },
++      copy: true,  // Create a copy instead of moving the original element
++      removeOnSpill: true  // Remove the copy if it's not dropped into a container
++    });
++
++    this.drake.on('drop', (el, target, source, sibling) => {
++      // Get the client ID and new status
++      const clientId = el.id;
++      const newStatus = this.getStatusFromContainer(target);
++
++      // Remove the temporary copy created by Dragula
++      el.remove();
++
++      // Update the state
++      this.setState(prevState => {
++        const updatedClients = {...prevState.clients};
++        let movedClient;
++
++        // Find and remove the client from its original status
++        for (let status in updatedClients) {
++          const index = updatedClients[status].findIndex(client => client.id === clientId);
++          if (index !== -1) {
++            movedClient = {...updatedClients[status][index], status: newStatus};
++            updatedClients[status].splice(index, 1);
++            break;
++          }
++        }
++
++        // Add the client to its new status
++        if (movedClient) {
++          updatedClients[newStatus].push(movedClient);
++        }
++
++        return {clients: updatedClients};
++      });
++    });
++  }
++  
++  componentWillUnmount() {
++    this.drake.destroy();
++  }
++
++  getStatusFromContainer(container) {
++    if (container === this.swimlanes.backlog.current) return 'backlog';
++    if (container === this.swimlanes.inProgress.current) return 'inProgress';
++    if (container === this.swimlanes.complete.current) return 'complete';
++    return '';
++  }
++
++  //Here we have listed the clients in the board.
+   getClients() {
+     return [
+-      ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],
+-      ['2','Wiza LLC','Exclusive Bandwidth-Monitored Implementation', 'complete'],
++      ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'backlog'],
++      ['2','Wiza LLC','Exclusive Bandwidth-Monitored Implementation', 'backlog'],
+       ['3','Nolan LLC','Vision-Oriented 4Thgeneration Graphicaluserinterface', 'backlog'],
+-      ['4','Thompson PLC','Streamlined Regional Knowledgeuser', 'in-progress'],
+-      ['5','Walker-Williamson','Team-Oriented 6Thgeneration Matrix', 'in-progress'],
++      ['4','Thompson PLC','Streamlined Regional Knowledgeuser', 'backlog'],
++      ['5','Walker-Williamson','Team-Oriented 6Thgeneration Matrix', 'backlog'],
+       ['6','Boehm and Sons','Automated Systematic Paradigm', 'backlog'],
+       ['7','Runolfsson, Hegmann and Block','Integrated Transitional Strategy', 'backlog'],
+       ['8','Schumm-Labadie','Operative Heuristic Challenge', 'backlog'],
+       ['9','Kohler Group','Re-Contextualized Multi-Tasking Attitude', 'backlog'],
+       ['10','Romaguera Inc','Managed Foreground Toolset', 'backlog'],
+-      ['11','Reilly-King','Future-Proofed Interactive Toolset', 'complete'],
++      ['11','Reilly-King','Future-Proofed Interactive Toolset', 'backlog'],
+       ['12','Emard, Champlin and Runolfsdottir','Devolved Needs-Based Capability', 'backlog'],
+-      ['13','Fritsch, Cronin and Wolff','Open-Source 3Rdgeneration Website', 'complete'],
++      ['13','Fritsch, Cronin and Wolff','Open-Source 3Rdgeneration Website', 'backlog'],
+       ['14','Borer LLC','Profit-Focused Incremental Orchestration', 'backlog'],
+-      ['15','Emmerich-Ankunding','User-Centric Stable Extranet', 'in-progress'],
+-      ['16','Willms-Abbott','Progressive Bandwidth-Monitored Access', 'in-progress'],
+-      ['17','Brekke PLC','Intuitive User-Facing Customerloyalty', 'complete'],
++      ['15','Emmerich-Ankunding','User-Centric Stable Extranet', 'backlog'],
++      ['16','Willms-Abbott','Progressive Bandwidth-Monitored Access', 'backlog'],
++      ['17','Brekke PLC','Intuitive User-Facing Customerloyalty', 'backlog'],
+       ['18','Bins, Toy and Klocko','Integrated Assymetric Software', 'backlog'],
+       ['19','Hodkiewicz-Hayes','Programmable Systematic Securedline', 'backlog'],
+       ['20','Murphy, Lang and Ferry','Organized Explicit Access', 'backlog'],
+@@ -50,6 +113,7 @@ export default class Board extends React.Component {
+       status: companyDetails[3],
+     }));
+   }
++
+   renderSwimlane(name, clients, ref) {
+     return (
+       <Swimlane name={name} clients={clients} dragulaRef={ref}/>
+diff --git a/src/Card.js b/src/Card.js
+index a8ad663..ce0f27b 100644
+--- a/src/Card.js
++++ b/src/Card.js
+@@ -6,14 +6,19 @@ export default class Card extends React.Component {
+     let className = ['Card'];
+     if (this.props.status === 'backlog') {
+       className.push('Card-grey');
+-    } else if (this.props.status === 'in-progress') {
++    } else if (this.props.status === 'inProgress') {
+       className.push('Card-blue');
+     } else if (this.props.status === 'complete') {
+       className.push('Card-green');
+     }
+     return (
+-      <div className={className.join(' ')} data-id={this.props.id} data-status={this.props.status}>
++      <div 
++        className={className.join(' ')} 
++        id={this.props.id}
++        data-status={this.props.status}
++      >
+         <div className="Card-title">{this.props.name}</div>
++        <div className="Card-description">{this.props.description}</div>
+       </div>
+     );
+   }
+diff --git a/src/Swimlane.js b/src/Swimlane.js
+index 7e6e0d0..da21cee 100644
+--- a/src/Swimlane.js
++++ b/src/Swimlane.js
+@@ -13,7 +13,7 @@ export default class Swimlane extends React.Component {
+           description={client.description}
+           status={client.status}
+         />
+-      );
++      );  
+     })
+     return (
+       <div className="Swimlane-column">
+-- 
+2.35.2.windows.1
+
